@@ -1,0 +1,343 @@
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QPushButton, QLineEdit, QCheckBox, QComboBox,
+    QTextEdit, QMessageBox, QStackedLayout, QGridLayout, QRadioButton,
+    QButtonGroup, QSpinBox, QTabWidget, QGroupBox, QScrollArea
+)
+from PySide6.QtCore import Qt
+import sys
+
+
+class InterfacesPython(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("InterfacesPython - Navaja Suiza PySide6")
+        self.setGeometry(100, 100, 900, 700)
+
+        # Widget central con pestañas
+        self.tabs = QTabWidget()
+        self.setCentralWidget(self.tabs)
+
+        # Crear pestañas para cada categoría
+        self.crear_tab_layouts()
+        self.crear_tab_inputs()
+        self.crear_tab_botones()
+        self.crear_tab_selectores()
+        self.crear_tab_texto()
+        self.crear_tab_mensajes()
+
+    def crear_tab_layouts(self):
+        """Pestaña de Layouts - líneas 30-90"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        # QVBoxLayout
+        grupo_vbox = QGroupBox("QVBoxLayout (líneas 34-41)")
+        layout_vbox = QVBoxLayout()
+        layout_vbox.addWidget(QLabel("Elemento 1 vertical"))
+        layout_vbox.addWidget(QLabel("Elemento 2 vertical"))
+        layout_vbox.addWidget(QLabel("Elemento 3 vertical"))
+        grupo_vbox.setLayout(layout_vbox)
+        layout_principal.addWidget(grupo_vbox)
+
+        # QHBoxLayout
+        grupo_hbox = QGroupBox("QHBoxLayout (líneas 43-51)")
+        layout_hbox = QHBoxLayout()
+        layout_hbox.addWidget(QLabel("Elem 1 →"))
+        layout_hbox.addWidget(QLabel("Elem 2 →"))
+        layout_hbox.addWidget(QLabel("Elem 3"))
+        grupo_hbox.setLayout(layout_hbox)
+        layout_principal.addWidget(grupo_hbox)
+
+        # QGridLayout
+        grupo_grid = QGroupBox("QGridLayout (líneas 52-61)")
+        layout_grid = QGridLayout()
+        layout_grid.addWidget(QLabel("Fila 0, Col 0"), 0, 0)
+        layout_grid.addWidget(QLabel("Fila 0, Col 1"), 0, 1)
+        layout_grid.addWidget(QLabel("Fila 1, Col 0"), 1, 0)
+        layout_grid.addWidget(QLabel("Fila 1, Col 1"), 1, 1)
+        layout_grid.addWidget(QLabel("Fila 2, Col 0-1 (span)"), 2, 0, 1, 2)
+        grupo_grid.setLayout(layout_grid)
+        layout_principal.addWidget(grupo_grid)
+
+        # QStackedLayout
+        grupo_stacked = QGroupBox("QStackedLayout (líneas 63-82)")
+        layout_stacked_container = QVBoxLayout()
+
+        self.stacked_layout = QStackedLayout()
+        widget1 = QLabel("📄 Página 1 del QStackedLayout")
+        widget1.setAlignment(Qt.AlignCenter)
+        widget2 = QLabel("📄 Página 2 del QStackedLayout")
+        widget2.setAlignment(Qt.AlignCenter)
+
+        self.stacked_layout.addWidget(widget1)
+        self.stacked_layout.addWidget(widget2)
+
+        botones_stacked = QHBoxLayout()
+        btn_pag1 = QPushButton("Mostrar Página 1")
+        btn_pag2 = QPushButton("Mostrar Página 2")
+        btn_pag1.clicked.connect(lambda: self.stacked_layout.setCurrentIndex(0))
+        btn_pag2.clicked.connect(lambda: self.stacked_layout.setCurrentIndex(1))
+        botones_stacked.addWidget(btn_pag1)
+        botones_stacked.addWidget(btn_pag2)
+
+        layout_stacked_container.addLayout(self.stacked_layout)
+        layout_stacked_container.addLayout(botones_stacked)
+        grupo_stacked.setLayout(layout_stacked_container)
+        layout_principal.addWidget(grupo_stacked)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "📐 Layouts")
+
+    def crear_tab_inputs(self):
+        """Pestaña de Inputs - líneas 92-125"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        # QLineEdit
+        grupo_lineedit = QGroupBox("QLineEdit (líneas 98-103)")
+        layout_lineedit = QGridLayout()
+        layout_lineedit.addWidget(QLabel("Usuario:"), 0, 0)
+        self.input_usuario = QLineEdit()
+        self.input_usuario.setPlaceholderText("Escribe tu nombre de usuario")
+        layout_lineedit.addWidget(self.input_usuario, 0, 1)
+        grupo_lineedit.setLayout(layout_lineedit)
+        layout_principal.addWidget(grupo_lineedit)
+
+        # QSpinBox
+        grupo_spinbox = QGroupBox("QSpinBox (líneas 105-113)")
+        layout_spinbox = QGridLayout()
+        layout_spinbox.addWidget(QLabel("Edad:"), 0, 0)
+        self.input_edad = QSpinBox()
+        self.input_edad.setMinimum(1)
+        self.input_edad.setMaximum(120)
+        self.input_edad.setValue(25)
+        layout_spinbox.addWidget(self.input_edad, 0, 1)
+        grupo_spinbox.setLayout(layout_spinbox)
+        layout_principal.addWidget(grupo_spinbox)
+
+        # Mostrar valores
+        grupo_valores = QGroupBox("Valores actuales")
+        layout_valores = QVBoxLayout()
+        self.label_valores_input = QLabel("Usuario: (vacío) | Edad: 25")
+        layout_valores.addWidget(self.label_valores_input)
+        btn_mostrar = QPushButton("Actualizar valores")
+        btn_mostrar.clicked.connect(self.actualizar_valores_input)
+        layout_valores.addWidget(btn_mostrar)
+        grupo_valores.setLayout(layout_valores)
+        layout_principal.addWidget(grupo_valores)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "⌨️ Inputs")
+
+    def crear_tab_botones(self):
+        """Pestaña de Botones - líneas 132-175"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        # QPushButton
+        grupo_pushbutton = QGroupBox("QPushButton (líneas 138-144)")
+        layout_pushbutton = QVBoxLayout()
+        btn_normal = QPushButton("Botón Normal")
+        btn_normal.clicked.connect(lambda: self.mostrar_info("Botón normal presionado"))
+        layout_pushbutton.addWidget(btn_normal)
+        grupo_pushbutton.setLayout(layout_pushbutton)
+        layout_principal.addWidget(grupo_pushbutton)
+
+        # QCheckBox
+        grupo_checkbox = QGroupBox("QCheckBox (líneas 146-155)")
+        layout_checkbox = QVBoxLayout()
+        self.check1 = QCheckBox("Opción 1")
+        self.check2 = QCheckBox("Opción 2")
+        self.check3 = QCheckBox("Opción 3 (preseleccionada)")
+        self.check3.setChecked(True)
+        layout_checkbox.addWidget(self.check1)
+        layout_checkbox.addWidget(self.check2)
+        layout_checkbox.addWidget(self.check3)
+        grupo_checkbox.setLayout(layout_checkbox)
+        layout_principal.addWidget(grupo_checkbox)
+
+        # QRadioButton con QButtonGroup
+        grupo_radio = QGroupBox("QRadioButton + QButtonGroup (líneas 157-169)")
+        layout_radio = QVBoxLayout()
+        self.radio_group = QButtonGroup()
+        self.radio1 = QRadioButton("Opción A")
+        self.radio2 = QRadioButton("Opción B")
+        self.radio3 = QRadioButton("Opción C")
+        self.radio1.setChecked(True)
+        self.radio_group.addButton(self.radio1, 1)
+        self.radio_group.addButton(self.radio2, 2)
+        self.radio_group.addButton(self.radio3, 3)
+        layout_radio.addWidget(self.radio1)
+        layout_radio.addWidget(self.radio2)
+        layout_radio.addWidget(self.radio3)
+        grupo_radio.setLayout(layout_radio)
+        layout_principal.addWidget(grupo_radio)
+
+        # Mostrar selecciones
+        btn_mostrar_sel = QPushButton("Mostrar selecciones")
+        btn_mostrar_sel.clicked.connect(self.mostrar_selecciones)
+        layout_principal.addWidget(btn_mostrar_sel)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "🔘 Botones")
+
+    def crear_tab_selectores(self):
+        """Pestaña de Selectores - líneas 182-210"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        # QComboBox
+        grupo_combo = QGroupBox("QComboBox (líneas 188-194)")
+        layout_combo = QGridLayout()
+        layout_combo.addWidget(QLabel("Rol:"), 0, 0)
+        self.combo_rol = QComboBox()
+        self.combo_rol.addItems(["Administrador", "Usuario", "Invitado", "Moderador"])
+        layout_combo.addWidget(self.combo_rol, 0, 1)
+        grupo_combo.setLayout(layout_combo)
+        layout_principal.addWidget(grupo_combo)
+
+        # QComboBox con eventos
+        grupo_combo2 = QGroupBox("QComboBox con evento (líneas 196-205)")
+        layout_combo2 = QVBoxLayout()
+        self.combo_pais = QComboBox()
+        self.combo_pais.addItems(["España", "México", "Argentina", "Colombia", "Chile"])
+        self.combo_pais.currentTextChanged.connect(self.cambio_combo)
+        self.label_combo_sel = QLabel("Selección: España")
+        layout_combo2.addWidget(QLabel("País:"))
+        layout_combo2.addWidget(self.combo_pais)
+        layout_combo2.addWidget(self.label_combo_sel)
+        grupo_combo2.setLayout(layout_combo2)
+        layout_principal.addWidget(grupo_combo2)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "📋 Selectores")
+
+    def crear_tab_texto(self):
+        """Pestaña de Texto - líneas 217-250"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        # QLabel
+        grupo_label = QGroupBox("QLabel (líneas 223-230)")
+        layout_label = QVBoxLayout()
+        label1 = QLabel("Esto es un QLabel simple")
+        label2 = QLabel("QLabel con HTML: <b>negrita</b>, <i>cursiva</i>, <u>subrayado</u>")
+        label3 = QLabel("QLabel con color")
+        label3.setStyleSheet("color: blue; font-size: 14px;")
+        layout_label.addWidget(label1)
+        layout_label.addWidget(label2)
+        layout_label.addWidget(label3)
+        grupo_label.setLayout(layout_label)
+        layout_principal.addWidget(grupo_label)
+
+        # QTextEdit
+        grupo_textedit = QGroupBox("QTextEdit (líneas 232-241)")
+        layout_textedit = QVBoxLayout()
+        self.text_edit = QTextEdit()
+        self.text_edit.setPlaceholderText("Escribe texto multilínea aquí...")
+        self.text_edit.setMaximumHeight(100)
+        layout_textedit.addWidget(self.text_edit)
+        btn_obtener_texto = QPushButton("Obtener texto de QTextEdit")
+        btn_obtener_texto.clicked.connect(self.obtener_texto)
+        layout_textedit.addWidget(btn_obtener_texto)
+        grupo_textedit.setLayout(layout_textedit)
+        layout_principal.addWidget(grupo_textedit)
+
+        # Área para mostrar resultado
+        self.label_resultado_texto = QLabel("El texto aparecerá aquí...")
+        self.label_resultado_texto.setWordWrap(True)
+        layout_principal.addWidget(self.label_resultado_texto)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "📝 Texto")
+
+    def crear_tab_mensajes(self):
+        """Pestaña de Mensajes - líneas 257-290"""
+        tab = QWidget()
+        layout_principal = QVBoxLayout()
+
+        grupo_messagebox = QGroupBox("QMessageBox (líneas 262-290)")
+        layout_messagebox = QVBoxLayout()
+
+        # Botones para diferentes tipos de mensajes
+        btn_info = QPushButton("Information (línea 267)")
+        btn_info.clicked.connect(lambda: QMessageBox.information(
+            self, "Información", "Este es un mensaje informativo"))
+
+        btn_warning = QPushButton("Warning (línea 271)")
+        btn_warning.clicked.connect(lambda: QMessageBox.warning(
+            self, "Advertencia", "Este es un mensaje de advertencia"))
+
+        btn_critical = QPushButton("Critical (línea 275)")
+        btn_critical.clicked.connect(lambda: QMessageBox.critical(
+            self, "Error", "Este es un mensaje de error crítico"))
+
+        btn_question = QPushButton("Question (línea 279)")
+        btn_question.clicked.connect(self.mostrar_pregunta)
+
+        layout_messagebox.addWidget(QLabel("Tipos de QMessageBox:"))
+        layout_messagebox.addWidget(btn_info)
+        layout_messagebox.addWidget(btn_warning)
+        layout_messagebox.addWidget(btn_critical)
+        layout_messagebox.addWidget(btn_question)
+
+        grupo_messagebox.setLayout(layout_messagebox)
+        layout_principal.addWidget(grupo_messagebox)
+
+        layout_principal.addStretch()
+        tab.setLayout(layout_principal)
+        self.tabs.addTab(tab, "💬 Mensajes")
+
+    # Métodos auxiliares
+    def actualizar_valores_input(self):
+        """líneas 297-300"""
+        usuario = self.input_usuario.text() or "(vacío)"
+        edad = self.input_edad.value()
+        self.label_valores_input.setText(f"Usuario: {usuario} | Edad: {edad}")
+
+    def mostrar_info(self, mensaje):
+        """líneas 302-303"""
+        QMessageBox.information(self, "Información", mensaje)
+
+    def mostrar_selecciones(self):
+        """líneas 305-314"""
+        checks = []
+        if self.check1.isChecked(): checks.append("Opción 1")
+        if self.check2.isChecked(): checks.append("Opción 2")
+        if self.check3.isChecked(): checks.append("Opción 3")
+
+        radio_sel = self.radio_group.checkedButton().text() if self.radio_group.checkedButton() else "Ninguno"
+
+        mensaje = f"CheckBoxes: {', '.join(checks) if checks else 'Ninguno'}\n"
+        mensaje += f"RadioButton: {radio_sel}"
+        QMessageBox.information(self, "Selecciones", mensaje)
+
+    def cambio_combo(self, texto):
+        """líneas 316-317"""
+        self.label_combo_sel.setText(f"Selección: {texto}")
+
+    def obtener_texto(self):
+        """líneas 319-320"""
+        self.label_resultado_texto.setText(f"Texto: {self.text_edit.toPlainText()}")
+
+    def mostrar_pregunta(self):
+        """líneas 322-329"""
+        respuesta = QMessageBox.question(
+            self, "Pregunta", "¿Quieres continuar?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No)
+        if respuesta == QMessageBox.StandardButton.Yes:
+            QMessageBox.information(self, "Respuesta", "Has seleccionado Sí")
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ventana = InterfacesPython()
+    ventana.show()
+    sys.exit(app.exec())
