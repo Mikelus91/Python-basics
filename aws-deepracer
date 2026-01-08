@@ -1,0 +1,82 @@
+import math
+
+def reward_function(params):
+    '''
+    Optimized reward function for a 45° vision angle and 3.3 m/s max speed:
+    - Encourages optimal racing line in curves
+    - Penalizes excessive speed in sharp turns with adjusted thresholds
+    - Rewards maintaining high speeds in straights
+    - Penalizes excessively low speeds
+    - Rewards faster lap completion
+    '''
+    # Read input parameters
+    is_offtrack = params['is_offtrack']
+    steering_angle = params['steering_angle']
+    speed = params['speed']
+    progress = params['progress']
+    steps = params['steps']
+    distance_from_center = params['distance_from_center']
+    track_width = params['track_width']
+    waypoints = params['waypoints']
+    closest_waypoints = params['closest_waypoints']
+    heading = params['heading']
+    x, y = params['x'], params['y']
+    
+    # Initialize reward
+    reward = 1.0
+
+    # Penalize going completely off-track
+    if is_offtrack:
+        return -1.0  # Stronger penalty for going off-track
+
+    # Calculate track direction
+    next_point = waypoints[closest_waypoints[1]]
+    prev_point = waypoints[closest_waypoints[0]]
+    track_direction = math.atan2(next_point[1] - prev_point[1], next_point[0] - prev_point[0])
+    direction_diff = abs(track_direction - heading)
+
+    # Encourage optimal racing line in curves
+    if abs(steering_angle) > 15:  # Sharp turn
+        # Reward for maintaining a controlled trajectory in sharp turns
+        if distance_from_center < 0.3 * track_width:
+            reward += 2.0  # Increased reward for optimal racing line
+        else:
+            reward *= 0.8  # Adjusted penalty for deviating from the optimal line
+
+        # Adjusted penalty for excessive speed in sharp turns
+        if speed > 2.8:
+            reward *= 0.75  # More progressive penalty for high speed in curves
+        elif speed > 2.5:
+            reward *= 0.85  # Lower penalty for moderate speed in curves
+
+    # Improve alignment with waypoints
+    if direction_diff > 10.0:  # Significant misalignment
+        reward *= 0.8  # Penalty for not following the correct direction
+    elif direction_diff < 10.0:
+        reward += 2.0  # Reward for correct alignment
+
+    # Reward maintaining high speeds in straights
+    if abs(steering_angle) < 5:  # Straight or nearly straight section
+        if speed >= 3.0:
+            reward += 4.0  # Maximum reward for high speed
+        elif speed >= 2.5:
+            reward += 3.0  # Medium reward for moderate speed
+
+    # Incentivize acceleration after curves
+    if abs(steering_angle) < 10 and speed < 2.5:
+        reward += 2.0  # Bonus for accelerating after exiting a turn
+
+    # Penalize excessively low speeds
+    if speed < 1.5:
+        reward *= 0.6  # Penalty for moving too slow
+
+    # Penalize unnecessary steering in straights
+    if abs(steering_angle) > 10 and direction_diff < 5.0:  # Sharp turn in straights
+        reward *= 0.7  # Penalty for unnecessary sharp turns
+
+    # Reward for completing a lap cleanly and quickly
+    if progress == 100 and not is_offtrack:
+        reward += 10.0  # Maximum reward for completing a clean lap
+        reward += 10.0 / steps  # Additional reward for completing the lap in fewer steps
+
+    return float(reward)
